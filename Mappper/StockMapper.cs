@@ -1,4 +1,4 @@
-﻿using Stock.Api.Dtos;
+﻿using Stock.Api.Dtos.Stock;
 using Stock.Api.Models;
 
 namespace Stock.Api.Mappper
@@ -18,5 +18,18 @@ namespace Stock.Api.Mappper
                 MarketCap = stockModel.MarketCap
             };
         }
+        public static Stocks ToStockModel(this CreateStock dto)
+        {
+            return new Stocks
+            {
+                Symbol = dto.Symbol,
+                CompanyName = dto.CompanyName,
+                Purchase = dto.Purchase,
+                LastDiv = dto.LastDiv,
+                Industry = dto.Industry,
+                MarketCap = dto.MarketCap
+            };
+        }
+
     }
 }
