@@ -1,0 +1,95 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Stock.Api.Data;
+using Stock.Api.Dtos.Comments;
+using Stock.Api.Mapper;   
+
+namespace Stock.Api.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class CommentController : ControllerBase
+    {
+        private readonly ApplicationDbContext _context;
+        public CommentController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> Index()
+        {
+            var comments = await _context.Comments.ToListAsync();
+            var commentDtos = comments.Select(c => c.ToCommentDto());
+            return Ok(commentDtos);
+        }
+        [HttpGet("{id}")]
+        public async Task<ActionResult> GetComment(int id)
+        {
+            var comment = await _context.Comments.FindAsync(id);
+            if (comment == null)
+            {
+                return NotFound();
+            }
+            return Ok(comment.ToCommentDto());
+        }
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateCommentDto commentDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+
+            var comment = commentDto.ToCommentModel();
+
+            await _context.Comments.AddAsync(comment);
+            await _context.SaveChangesAsync();
+
+
+            var commentResponse = comment.ToCommentDto();
+
+            return CreatedAtAction(nameof(GetComment), new { id = comment.Id }, commentResponse);
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var deleted = await _context.Comments.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (deleted == null)
+            {
+                return NotFound("Comment not found");
+            }
+
+            _context.Comments.Remove(deleted);
+            await _context.SaveChangesAsync();    
+
+            return NoContent();
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateCommentDto updateCommentDto)
+        {
+         
+            var existing = await _context.Comments.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (existing == null)
+                return NotFound("Comment not found");
+
+         
+            existing.Title = updateCommentDto.Title;
+            existing.Content = updateCommentDto.Content;
+           
+
+          
+            await _context.SaveChangesAsync();
+
+            var updatedDto = existing.ToCommentDto();
+
+            return Ok(updatedDto);
+        }
+
+
+
+
+    }
+}
