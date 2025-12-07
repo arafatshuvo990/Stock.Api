@@ -2,7 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Stock.Api.Data;
 using Stock.Api.Dtos.Comments;
-using Stock.Api.Mapper;   
+using Stock.Api.Interfaces;
+using Stock.Api.Mapper;
+using Stock.Api.Repository;
 
 namespace Stock.Api.Controllers
 {
@@ -11,15 +13,17 @@ namespace Stock.Api.Controllers
     public class CommentController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        public CommentController(ApplicationDbContext context)
+        private readonly ICommentRepository _commentRepository;
+        public CommentController(ApplicationDbContext context, ICommentRepository commentRepository)
         {
             _context = context;
+            _commentRepository = commentRepository;
         }
 
         [HttpGet]
         public async Task<ActionResult> Index()
         {
-            var comments = await _context.Comments.ToListAsync();
+            var comments = await _commentRepository.GetAllAsync();
             var commentDtos = comments.Select(c => c.ToCommentDto());
             return Ok(commentDtos);
         }
