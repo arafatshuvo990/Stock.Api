@@ -33,20 +33,14 @@ namespace Stock.Api.Repository
             return Task.FromResult<Comments?>(oldComment);
         }
 
-        public async Task<List<Comments>> GetAllAsync(QueryObject query)
+        public async Task<List<Comments>> GetAllAsync()
         {
-            var comments = _context.Comments.Include(a => a.Id).AsQueryable();
-            if (!string.IsNullOrWhiteSpace(query.Symbol))
-            {
-                comments = comments.Where(s => s.Stock.Symbol == query.Symbol);
-            }
-            ;
-            if (query.IsDecsending == true)
-            {
-                comments = comments.OrderByDescending(c => c.CreatedOn);
-            }
-            return await comments.ToListAsync();
+            return await _context.Comments
+                .Include(c => c.Stock)
+                .ToListAsync();
         }
+
+
 
         public async Task<Comments?> GetByIdAsync(int id)
         {
