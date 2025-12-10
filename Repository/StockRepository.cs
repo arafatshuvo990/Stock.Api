@@ -27,7 +27,23 @@ namespace Stock.Api.Repository
             {
                 stockQuery = stockQuery.Where(s => s.CompanyName.Contains(query.CompanyName));
             }
-            return await stockQuery.ToListAsync();
+            if (!string.IsNullOrWhiteSpace(query.Symbol))
+            {
+                stockQuery = stockQuery.Where(s => s.Symbol.Contains(query.Symbol));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.SortBy))
+            {
+                if (query.SortBy.Equals("Symbol", StringComparison.OrdinalIgnoreCase))
+                {
+                    stockQuery = query.IsDecsending ? stockQuery.OrderByDescending(s => s.Symbol) : stockQuery.OrderBy(s => s.Symbol);
+                }
+            }
+
+            var skipNumber = (query.PageNumber - 1) * query.PageSize;
+
+
+            return await stockQuery.Skip(skipNumber).Take(query.PageSize).ToListAsync();
         }
 
         public async Task<Stocks?> GetByIdAsync(int id)

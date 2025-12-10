@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Stock.Api.Data;
 using Stock.Api.Dtos.Comments;
+using Stock.Api.Helpers;
 using Stock.Api.Interfaces;
 using Stock.Api.Models;
 
@@ -32,9 +33,19 @@ namespace Stock.Api.Repository
             return Task.FromResult<Comments?>(oldComment);
         }
 
-        public async Task<List<Comments>> GetAllAsync()
+        public async Task<List<Comments>> GetAllAsync(QueryObject query)
         {
-            return await _context.Comments.ToListAsync();
+            var comments = _context.Comments.Include(a => a.Id).AsQueryable();
+            if (!string.IsNullOrWhiteSpace(query.Symbol))
+            {
+                comments = comments.Where(s => s.Stock.Symbol == query.Symbol);
+            }
+            ;
+            if (query.IsDecsending == true)
+            {
+                comments = comments.OrderByDescending(c => c.CreatedOn);
+            }
+            return await comments.ToListAsync();
         }
 
         public async Task<Comments?> GetByIdAsync(int id)
