@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using Stock.Api.Data;
+using Stock.Api.Dtos.Comments;
 using Stock.Api.Interfaces;
 using Stock.Api.Models;
 
@@ -22,7 +24,12 @@ namespace Stock.Api.Repository
 
         public Task<Comments?> DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            var oldComment = _context.Comments.FirstOrDefault(c => c.Id == id);
+            if (oldComment == null)
+                return Task.FromResult<Comments?>(null);
+            _context.Comments.Remove(oldComment);
+            _context.SaveChanges();
+            return Task.FromResult<Comments?>(oldComment);
         }
 
         public async Task<List<Comments>> GetAllAsync()
@@ -30,14 +37,21 @@ namespace Stock.Api.Repository
             return await _context.Comments.ToListAsync();
         }
 
-        public Task<Comments?> GetByIdAsync(int id)
+        public async Task<Comments?> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Comments.FirstOrDefaultAsync(c => c.Id == id);
         }
 
-        public Task<Comments?> UpdateAsync(int id, Comments commentModel)
+        public async Task<Comments?> UpdateAsync(int id, UpdateCommentDto commentDto)
         {
-            throw new NotImplementedException();
+            var existingComment = await _context.Comments.FirstOrDefaultAsync(c => c.Id == id);
+            if (existingComment == null)
+                return null;
+            existingComment.Title = commentDto.Title;
+            existingComment.Content = commentDto.Content;
+
+            await _context.SaveChangesAsync();
+            return existingComment;
         }
     }
 }
