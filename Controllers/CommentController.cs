@@ -56,15 +56,11 @@ namespace Stock.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var deleted = await _context.Comments.FirstOrDefaultAsync(x => x.Id == id);
-
+            var deleted = await _commentRepository.DeleteAsync(id);
             if (deleted == null)
             {
                 return NotFound("Comment not found");
             }
-
-            _context.Comments.Remove(deleted);
-            await _context.SaveChangesAsync();    
 
             return NoContent();
         }
@@ -72,24 +68,17 @@ namespace Stock.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateCommentDto updateCommentDto)
         {
-         
-            var existing = await _context.Comments.FirstOrDefaultAsync(x => x.Id == id);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            if (existing == null)
+            var updatedComment = await _commentRepository.UpdateAsync(id, updateCommentDto);
+
+            if (updatedComment == null)
                 return NotFound("Comment not found");
 
-         
-            existing.Title = updateCommentDto.Title;
-            existing.Content = updateCommentDto.Content;
-           
-
-          
-            await _context.SaveChangesAsync();
-
-            var updatedDto = existing.ToCommentDto();
-
-            return Ok(updatedDto);
+            return Ok(updatedComment.ToCommentDto());
         }
+
 
 
 
