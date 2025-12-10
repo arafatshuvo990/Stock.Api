@@ -43,17 +43,16 @@ namespace Stock.Api.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-
             var comment = commentDto.ToCommentModel();
 
-            await _context.Comments.AddAsync(comment);
-            await _context.SaveChangesAsync();
+           
+            var createdComment = await _commentRepository.CreateAsync(comment);
 
+            var commentResponse = createdComment.ToCommentDto();
 
-            var commentResponse = comment.ToCommentDto();
-
-            return CreatedAtAction(nameof(GetComment), new { id = comment.Id }, commentResponse);
+            return CreatedAtAction(nameof(GetComment), new { id = createdComment.Id }, commentResponse);
         }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

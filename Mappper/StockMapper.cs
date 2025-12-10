@@ -1,4 +1,5 @@
 ﻿using Stock.Api.Dtos.Stock;
+using Stock.Api.Mapper;
 using Stock.Api.Models;
 
 namespace Stock.Api.Mappper
@@ -15,7 +16,8 @@ namespace Stock.Api.Mappper
                 Purchase = stockModel.Purchase,
                 LastDiv = stockModel.LastDiv,
                 Industry = stockModel.Industry,
-                MarketCap = stockModel.MarketCap
+                MarketCap = stockModel.MarketCap,
+                Comments = stockModel.Comments?.Select(c => c.ToCommentDto()).ToList()
             };
         }
         public static Stocks ToStockModel(this CreateStock dto)

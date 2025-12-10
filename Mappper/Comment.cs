@@ -22,6 +22,7 @@ namespace Stock.Api.Mapper
             {
                 Title = createCommentDto.Title,
                 Content = createCommentDto.Content,
+                StockId = createCommentDto.StockId,
                 CreatedOn = createCommentDto.CreatedOn
             };
         }

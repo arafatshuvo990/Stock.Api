@@ -12,9 +12,12 @@ namespace Stock.Api.Repository
         {
             _context = context;
         }
-        public Task<Comments> CreateAsync(Comments commentModel)
+        public async Task<Comments> CreateAsync(Comments commentModel)
         {
-            throw new NotImplementedException();
+            await _context.Comments.AddAsync(commentModel);
+            await _context.SaveChangesAsync();
+            return commentModel;
+
         }
 
         public Task<Comments?> DeleteAsync(int id)
