@@ -13,7 +13,7 @@ namespace Stock.Api.Data
         }
         public DbSet<Stocks> Stock { get; set; }
         public DbSet<Comments> Comments { get; set; }
-
+        public DbSet<Portfolio> Portfolio { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
