@@ -18,5 +18,18 @@ namespace Stock.Api.Controllers
             var portfolios = _context.Portfolio.ToList();
             return Ok(portfolios);
         }
+        [HttpGet("{id}")]
+        public IActionResult GetPortfolio(int id)
+        {
+            var portfolio = _context.Portfolio.FirstOrDefault(p => p.Id == id);
+
+            if (portfolio == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(portfolio);
+        }
+
     }
 }
